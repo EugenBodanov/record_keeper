@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="24dp"
+    tools:context=".cycling.EditCyclingRecordActivity">
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/text_input_record"
+        style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/text_record"
+        app:endIconMode="clear_text"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/edit_text_record"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            tools:text="24:15" />
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/text_input_date"
+        style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:hint="@string/text_date"
+        app:endIconMode="clear_text"
+        app:layout_constraintTop_toBottomOf="@id/text_input_record">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/edit_text_date"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            tools:text="02.11.2025" />
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/button_save"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="48dp"
+        android:text="@string/text_save"
+        app:layout_constraintTop_toBottomOf="@id/text_input_date" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/button_delete"
+        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:text="@string/text_clear_record"
+        app:layout_constraintTop_toBottomOf="@id/button_save" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
