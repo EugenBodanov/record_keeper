@@ -2,7 +2,28 @@
     <!-- Base application theme. -->
     <style name="Base.Theme.RecordKeeper" parent="Theme.Material3.DayNight">
         <!-- Customize your light theme here. -->
-<!--         <item name="colorPrimary">@color/primary_color</item>-->
+        <item name="colorPrimary">@color/green_500</item>
+        <item name="colorPrimaryVariant">@color/green_800</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
+        <item name="colorOnBackground">@color/dark_grey</item>
+    </style>
+
+    <style name="RecordValueTextAppearance">
+        <item name="android:textSize">20sp</item>
+        <item name="android:textColor">?attr/colorOnBackground</item>
+        <item name="android:fontFamily">sans-serif-light</item>
+    </style>
+
+    <style name="RecordDateTextAppearance">
+        <item name="android:textSize">16sp</item>
+        <item name="android:fontFamily">sans-serif-light</item>
+    </style>
+
+    <style name="RecordNameTextAppearance">
+        <item name="android:textSize">20sp</item>
+        <item name="android:textColor">?attr/colorPrimary</item>
+        <item name="android:fontFamily">sans-serif</item>
     </style>
 
     <style name="Theme.RecordKeeper" parent="Base.Theme.RecordKeeper" />

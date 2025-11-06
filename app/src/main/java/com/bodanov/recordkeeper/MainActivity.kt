@@ -3,16 +3,20 @@ package com.bodanov.recordkeeper
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
-import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.datastore.preferences.core.edit
 import androidx.fragment.app.commit
+import androidx.lifecycle.lifecycleScope
 import com.bodanov.recordkeeper.cycling.CyclingFragment
 import com.bodanov.recordkeeper.databinding.ActivityMainBinding
 import com.bodanov.recordkeeper.running.RunningFragment
 import com.google.android.material.navigation.NavigationBarView
+import com.google.android.material.snackbar.Snackbar
+import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity(), NavigationBarView.OnItemSelectedListener {
 
@@ -29,22 +33,6 @@ class MainActivity : AppCompatActivity(), NavigationBarView.OnItemSelectedListen
             insets
         }
 
-//        binding.bottomNav.setOnItemSelectedListener { item ->
-//            when (item.itemId) {
-//                R.id.nav_cycling -> {
-//                    onCyclingClicked()
-//                    true
-//                }
-//                R.id.nav_running -> {
-//                    onRunningClicked()
-//                    true
-//                }
-//                else -> {
-//                    false
-//                }
-//            }
-//        }
-
         binding.bottomNav.setOnItemSelectedListener(this)
 
     }
@@ -56,21 +44,67 @@ class MainActivity : AppCompatActivity(), NavigationBarView.OnItemSelectedListen
 
     override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
         R.id.reset_running -> {
-            Toast.makeText(this, "Clicked the Reset Running menu item", Toast.LENGTH_SHORT).show()
+            showConfirmationDialog(DataStoreFileName.RUNNING)
             true
         }
 
         R.id.reset_cycling -> {
-            Toast.makeText(this, "Clicked the Reset Cycling menu item", Toast.LENGTH_SHORT).show()
+            showConfirmationDialog(DataStoreFileName.CYCLING)
             true
         }
 
         R.id.reset_all -> {
-            Toast.makeText(this, "Clicked the Reset All menu item", Toast.LENGTH_SHORT).show()
+            showConfirmationDialog(ALL)
             true
         }
 
         else -> super.onOptionsItemSelected(item)
+    }
+
+    private fun showConfirmationDialog(selection: String) {
+        AlertDialog.Builder(this)
+            .setTitle("Reset $selection records")
+            .setMessage("Are you sure you want to clear the records?")
+            .setPositiveButton("Yes") { _, _ ->
+                lifecycleScope.launch {
+                    when (selection) {
+                        ALL -> {
+                            DataStoreC.of(
+                                this@MainActivity,
+                                DataStoreFileName.RUNNING
+                            ).edit { preferences ->
+                                preferences.clear()
+                            }
+                            DataStoreC.of(
+                                this@MainActivity,
+                                DataStoreFileName.CYCLING
+                            ).edit { preferences ->
+                                preferences.clear()
+                            }
+                        }
+
+                        else -> {
+                            DataStoreC.of(this@MainActivity, selection).edit { preferences ->
+                                preferences.clear()
+                            }
+                        }
+                    }
+                    showConfirmation(selection)
+                }
+            }
+            .setNegativeButton("No") { dialog, _ ->
+                dialog.dismiss()
+            }.show()
+    }
+
+    private fun showConfirmation(selection: String) {
+        val snackbar = Snackbar.make(
+            binding.frameContent,
+            "${selection.replaceFirstChar { c -> c.uppercaseChar() }} records cleared successfully!",
+            Snackbar.LENGTH_LONG
+        )
+        snackbar.anchorView = binding.bottomNav
+        snackbar.show()
     }
 
     private fun onCyclingClicked(): Boolean {

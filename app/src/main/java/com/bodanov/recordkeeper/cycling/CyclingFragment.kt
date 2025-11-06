@@ -5,14 +5,18 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import com.bodanov.recordkeeper.DataStoreC
+import com.bodanov.recordkeeper.DataStoreFileName
+import com.bodanov.recordkeeper.DataStoreKeys
+import com.bodanov.recordkeeper.INTENT_EXTRA_SCREEN_DATA
 import com.bodanov.recordkeeper.databinding.FragmentCyclingBinding
+import com.bodanov.recordkeeper.editing.EditRecordActivity
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
 import java.io.IOException
@@ -22,12 +26,12 @@ class CyclingFragment : Fragment() {
     private var _binding: FragmentCyclingBinding? = null
     private val binding get() = _binding!!
 
-    private lateinit var recordKeyLongestRide: Preferences.Key<String>
-    private lateinit var dateKeyLongestRide: Preferences.Key<String>
-    private lateinit var recordKeyBiggestClimb: Preferences.Key<String>
-    private lateinit var dateKeyBiggestClimb: Preferences.Key<String>
-    private lateinit var recordKeyBestAverageSpeed: Preferences.Key<String>
-    private lateinit var dateKeyBestAverageSpeed: Preferences.Key<String>
+    private val recordKeyLongestRide = stringPreferencesKey("Longest Ride_${DataStoreKeys.RECORD_KEY}")
+    private val dateKeyLongestRide = stringPreferencesKey("Longest Ride_${DataStoreKeys.DATE_KEY}")
+    private val recordKeyBiggestClimb = stringPreferencesKey("Biggest Climb_${DataStoreKeys.RECORD_KEY}")
+    private val dateKeyBiggestClimb = stringPreferencesKey("Biggest Climb_${DataStoreKeys.DATE_KEY}")
+    private val recordKeyBestAverageSpeed = stringPreferencesKey("Best Average Speed_${DataStoreKeys.RECORD_KEY}")
+    private val dateKeyBestAverageSpeed = stringPreferencesKey("Best Average Speed_${DataStoreKeys.DATE_KEY}")
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -41,12 +45,11 @@ class CyclingFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setUpClickListener()
-        initPreferences()
         setScreenData()
     }
 
     private fun setScreenData() {
-        val data = requireContext().cycling.data.catch { e ->
+        val data = DataStoreC.of(requireContext(), DataStoreFileName.CYCLING).data.catch { e ->
             if (e is IOException) emit(
                 emptyPreferences()
             ) else throw e
@@ -59,7 +62,8 @@ class CyclingFragment : Fragment() {
                     binding.textViewLongestRideDate.text = dict[dateKeyLongestRide] ?: ""
                     binding.textViewBiggestClimbValue.text = dict[recordKeyBiggestClimb] ?: ""
                     binding.textViewBiggestClimbDate.text = dict[dateKeyBiggestClimb] ?: ""
-                    binding.textViewBestAverageSpeedValue.text = dict[recordKeyBestAverageSpeed] ?: ""
+                    binding.textViewBestAverageSpeedValue.text =
+                        dict[recordKeyBestAverageSpeed] ?: ""
                     binding.textViewBestAverageSpeedDate.text = dict[dateKeyBestAverageSpeed] ?: ""
                 }
             }
@@ -67,24 +71,36 @@ class CyclingFragment : Fragment() {
 
     }
 
-    private fun initPreferences() {
-        recordKeyLongestRide = stringPreferencesKey("Longest Ride_record")
-        dateKeyLongestRide = stringPreferencesKey("Longest Ride_date")
-        recordKeyBiggestClimb = stringPreferencesKey("Biggest Climb_record")
-        dateKeyBiggestClimb = stringPreferencesKey("Biggest Climb_date")
-        recordKeyBestAverageSpeed = stringPreferencesKey("Best Average Speed_record")
-        dateKeyBestAverageSpeed = stringPreferencesKey("Best Average Speed_date")
-    }
-
     private fun setUpClickListener() {
-        binding.containerLongestRide.setOnClickListener { launchCyclingRecordScreen("Longest Ride") }
-        binding.containerBiggestClimb.setOnClickListener { launchCyclingRecordScreen("Biggest Climb") }
-        binding.containerBestAverageSpeed.setOnClickListener { launchCyclingRecordScreen("Best Average Speed") }
+        binding.containerLongestRide.setOnClickListener {
+            launchCyclingRecordScreen(
+                "Longest Ride",
+                "Distance"
+            )
+        }
+        binding.containerBiggestClimb.setOnClickListener {
+            launchCyclingRecordScreen(
+                "Biggest Climb",
+                "Height"
+            )
+        }
+        binding.containerBestAverageSpeed.setOnClickListener {
+            launchCyclingRecordScreen(
+                "Best Average Speed",
+                "Average Speed"
+            )
+        }
     }
 
-    private fun launchCyclingRecordScreen(title: String) {
-        val intent = Intent(requireContext(), EditCyclingRecordActivity::class.java)
-        intent.putExtra("title", title)
+    private fun launchCyclingRecordScreen(record: String, recordFieldHint: String) {
+        val intent = Intent(requireContext(), EditRecordActivity::class.java)
+        intent.putExtra(
+            INTENT_EXTRA_SCREEN_DATA, EditRecordActivity.ScreenData(
+                record,
+                DataStoreFileName.CYCLING,
+                recordFieldHint
+            )
+        )
         startActivity(intent)
     }
 

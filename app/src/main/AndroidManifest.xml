@@ -12,14 +12,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.RecordKeeper">
         <activity
-            android:name=".cycling.EditCyclingRecordActivity"
-            android:parentActivityName=".MainActivity"
-            android:exported="false" />
-        <activity
-            android:name=".running.EditRunningRecordActivity"
-            android:exported="false"
-            android:parentActivityName=".MainActivity" />
-        <activity
+            android:launchMode="singleTop"
             android:name=".MainActivity"
             android:exported="true">
             <intent-filter>
@@ -28,6 +21,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name="com.bodanov.recordkeeper.editing.EditRecordActivity"
+            android:parentActivityName=".MainActivity" />
     </application>
 
 </manifest>
